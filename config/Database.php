@@ -1,4 +1,5 @@
 <?php
+namespace Config\Model;
 class Database
 {
     public $host;

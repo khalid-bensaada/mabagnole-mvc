@@ -1,7 +1,9 @@
 <?php
-require_once 'Database.php';
+namespace App\Model;
+require_once '../config/Database.php';
 
-class Vehicule extends Database
+$user = new \Config\Model\Database();
+class Vehicule extends \Config\Model\Database
 {
     
     private $categorie_id;

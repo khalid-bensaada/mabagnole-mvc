@@ -1,4 +1,6 @@
 <?php
+namespace App\Model;
+
 require_once 'Database.php';
 class Categorie extends Database
 {
