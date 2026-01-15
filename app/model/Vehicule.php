@@ -1,11 +1,10 @@
 <?php
-namespace App\Model;
-require_once '../config/Database.php';
 
-$user = new \Config\Model\Database();
-class Vehicule extends \Config\Model\Database
+require_once 'BaseModel.php';
+
+class Vehicule extends BaseModel
 {
-    
+    private $id;
     private $categorie_id;
     private $modele;
     private $prix;
@@ -14,21 +13,21 @@ class Vehicule extends \Config\Model\Database
     private $created_v;
     private $image;
 
-    public function __construct( $categorie_id = 0 , $modele = "", $prix = 0, $disponibilite = 1, $description_v = "", $created_v = null, $image ="")
+    public function __construct($id, $categorie_id = 0, $modele = "", $prix = 0, $disponibilite = 1, $description_v = "", $created_v = null, $image = "")
     {
-        parent::__construct();
-        
+
+        $this->id = $id;
         $this->categorie_id = $categorie_id;
         $this->modele = $modele;
         $this->prix = $prix;
         $this->disponibilite = $disponibilite;
         $this->description_v = $description_v;
-        $this->created_v = $created_v ;
+        $this->created_v = $created_v;
         $this->image = $image;
     }
 
     // GETTERS
-    
+
     public function getCategorieId()
     {
         return $this->categorie_id;
@@ -92,21 +91,35 @@ class Vehicule extends \Config\Model\Database
     }
 
     // CREATE
-    public function create()
+    public function save(): bool
     {
-        
-        $sql = "INSERT INTO vehicule (categorie_id, modele, prix, disponibilite, description_v, image) 
+        if ($this->id === 0) {
+            $sql = "INSERT INTO vehicule (categorie_id, modele, prix, disponibilite, description_v, image) 
         VALUES (:categorie_id, :modele, :prix, :disponibilite, :description_v, :image)";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':categorie_id' => $this->categorie_id,
-            ':modele' => $this->modele,
-            ':prix' => $this->prix,
-            ':disponibilite' => $this->disponibilite,
-            ':description_v' => $this->description_v,
-            ':image' => $this->image
-        ]);
+            $stmt = $this->pdo->prepare($sql);
+            return $stmt->execute([
+                ':categorie_id' => $this->categorie_id,
+                ':modele' => $this->modele,
+                ':prix' => $this->prix,
+                ':disponibilite' => $this->disponibilite,
+                ':description_v' => $this->description_v,
+                ':image' => $this->image
+            ]);
+        } else {
+            $sql = "UPDATE vehicule 
+                SET catecorie_id = :categorie_id, modele = :modele, prix = :prix, 
+                    disponibilite = :disponibilite, description_v = :description_v
+                WHERE id_v = :id";
+            $stmt = $this->pdo->prepare($sql);
+            return $stmt->execute([
+                ':categorie_id' => $this->categorie_id,
+                ':modele' => $this->modele,
+                ':prix' => $this->prix,
+                ':disponibilite' => $this->disponibilite,
+                ':description_v' => $this->description_v
 
+            ]);
+        }
     }
 
 
@@ -131,23 +144,7 @@ class Vehicule extends \Config\Model\Database
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // UPDATE
-    public function update($id)
-    {
-        $sql = "UPDATE vehicule 
-                SET catecorie_id = :categorie_id, modele = :modele, prix = :prix, 
-                    disponibilite = :disponibilite, description_v = :description_v
-                WHERE id_v = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':categorie_id' => $this->categorie_id,
-            ':modele' => $this->modele,
-            ':prix' => $this->prix,
-            ':disponibilite' => $this->disponibilite,
-            ':description_v' => $this->description_v,
-            ':id' => $id
-        ]);
-    }
+
 
     // DELETE
     public function delete($id)
@@ -158,13 +155,13 @@ class Vehicule extends \Config\Model\Database
     }
 
     // SEARCH by modele
-    public function searchByModele($keyword)
+    public static function find($keyword)
     {
         $sql = "SELECT v.*, c.name_c AS categorie 
                 FROM vehicule v 
                 JOIN categorie c ON v.categorie_id = c.id_c
                 WHERE v.modele LIKE :keyword";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = self::$pdo->prepare($sql);
         $stmt->execute([':keyword' => "%$keyword%"]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -192,7 +189,4 @@ class Vehicule extends \Config\Model\Database
         $stmt = $this->pdo->query("SELECT COUNT(*) FROM vehicule WHERE disponibilite = 1");
         return $stmt->fetchColumn();
     }
-
 }
-
-?>
