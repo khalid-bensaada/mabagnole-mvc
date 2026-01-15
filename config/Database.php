@@ -1,34 +1,24 @@
 <?php
-namespace Config\Model;
+
 class Database
 {
-    public $host;
-    public $dbname;
-    public $username;
-    public $password;
-    public $pdo;
+    private static ?PDO $instance = null;
 
-    public function __construct($host = 'localhost', $dbname = 'mabagnol', $username = 'root', $password = '')
+
+    public static function getInstance(): PDO
     {
-        $this->host = $host;
-        $this->dbname = $dbname;
-        $this->username = $username;
-        $this->password = $password;
-        $conn = "mysql:host={$this->host};dbname={$this->dbname};charset=utf8";
+        if (self::$instance === null) {
+            self::$instance = new PDO(
+                "mysql:host=localhost;dbname=mabagnol;charset=utf8",
+                "root",
+                "",
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                ]
+            );
+        }
 
-        $error = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-        ];
-        try {
-            $this->pdo = new PDO($conn, $this->username, $this->password, $error);
-        } catch (PDOException $e) {
-            die("Erreur de connexion : " . $e->getMessage());
-        }    
-    }
-
-    public function getPdo(){
-        return $this->pdo ;
+        return self::$instance;
     }
 }
-
-?>
