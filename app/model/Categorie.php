@@ -7,16 +7,17 @@ class Categorie extends BaseModel
     private int $id;
     private string $nom;
     private string $description;
+    public $vehicules = [];
 
 
-
-    public function __construct(int $id, string $nom = '', string $description)
+    public function __construct(int $id, string $nom = '', string $description ,  $vehicules = [])
     {
 
         $this->id = $id;
         $this->nom = $nom;
         $this->description = $description;
-    }
+        $this->vehicules = $vehicules;
+    }   
 
 
 
@@ -101,7 +102,6 @@ class Categorie extends BaseModel
         $stmt->execute([':id' => $id]);
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
-
     }
 
 
@@ -116,5 +116,19 @@ class Categorie extends BaseModel
         $stmt = $this->pdo->query($sql);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function loadVehicules()
+    {
+        if (!$this->id) return;
+
+        $sql = "SELECT v.* 
+                FROM vehicules v
+                JOIN categories c ON v.categorie_id = c.id
+                WHERE c.id = :id";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $this->id]);
+
+        $this->vehicules = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
