@@ -1,7 +1,6 @@
 <?php
-namespace App\Model;
-require_once 'Database.php';
-class Client extends Database
+require_once 'BaseModel.php';
+class Client extends BaseModel
 {
     
     private $id;
@@ -12,11 +11,11 @@ class Client extends Database
     private $timeC;
     public function __construct(int $id = 0, string $name = "", string $email = "", string $passwordC = "", string $role = "", float $timeC = 0.0)
 {
-    parent::__construct();
+    
     $this->id = $id;
     $this->name = $name;
     $this->email = $email;
-    $this->password = $passwordC;
+    $this->passwordC = $passwordC;
     $this->role = $role;
     $this->timeC = $timeC;
 }
@@ -35,7 +34,7 @@ class Client extends Database
     }
     public function getPassword(): string
     {
-        return $this->password;
+        return $this->passwordC;
     }
     public function getRole(): string
     {
@@ -57,7 +56,7 @@ class Client extends Database
     }
     public function setPassword(string $password)
     {
-        $this->password = $password;
+        $this->passwordC = $password;
     }
     public function setRole(string $role)
     {
@@ -71,11 +70,11 @@ class Client extends Database
     // PASSWORD HASHING
     public function hash()
     {
-        $password_hash = password_hash($this->password , PASSWORD_DEFAULT);
-        $this->password = $password_hash;
+        $password_hash = password_hash($this->passwordC , PASSWORD_DEFAULT);
+        $this->passwordC = $password_hash;
     }
     // CREATION A CLIENT
-    public function create()
+    public function save(): bool
     {
         $sql = "INSERT INTO client (name ,email ,password_C ,role )
         VALUES (:name , :email, :password ,:role)";
@@ -85,23 +84,23 @@ class Client extends Database
         return $stmt->execute([
             ':name' => $this->name,
             ':email' => $this->email,
-            ':password' => $this->password,
+            ':password' => $this->passwordC,
             ':role' => $this->role
         ]);
 
     }
 
     // SELECT CLIENT FROM HIS EMAIL
-    public function foundEmail($email)
+    public static function find($email)
     { 
-        $stmt = $this->pdo->prepare("SELECT * FROM client WHERE email = ?");
+        $stmt = self::$pdo->prepare("SELECT * FROM client WHERE email = ?");
         $stmt->execute([$email]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function verifyP($password)
     {
-        return password_verify($password, $this->password);
+        return password_verify($password, $this->passwordC);
     }
     
     public function countAll()
