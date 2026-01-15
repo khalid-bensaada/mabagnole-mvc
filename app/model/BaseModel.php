@@ -8,5 +8,8 @@ abstract class BaseModel
     {
         $this->pdo = $pdo;
     }
+
+    abstract public function save():bool;
+    abstract public static function find(int $id);
 }
 ?>
