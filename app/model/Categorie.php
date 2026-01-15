@@ -1,8 +1,7 @@
 <?php
-namespace App\Model;
+require_once 'BaseModel.php';
+class Categorie extends BaseModel
 
-require_once 'Database.php';
-class Categorie extends Database
 {
 
     private int $id;
@@ -13,7 +12,7 @@ class Categorie extends Database
 
     public function __construct(int $id, string $nom = '', string $description)
     {
-        parent::__construct();
+
         $this->id = $id;
         $this->nom = $nom;
         $this->description = $description;
@@ -49,31 +48,29 @@ class Categorie extends Database
 
 
 
-    public function create()
+    public function save(): bool
     {
-        $sql = "INSERT INTO categorie (name_c, description)
+        if ($this->id === 0) {
+            $sql = "INSERT INTO categorie (name_c, description)
                 VALUES (:nom, :description)";
-        $stmt = $this->pdo->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
-            ':nom' => $this->nom,
-            ':description' => $this->description
-        ]);
-    }
-
-
-    public function update()
-    {
-        $sql = "UPDATE categorie 
+            return $stmt->execute([
+                ':nom' => $this->nom,
+                ':description' => $this->description
+            ]);
+        } else {
+            $sql = "UPDATE categorie 
                 SET name_c = :nom, description = :description
                 WHERE id_c = :id";
-        $stmt = $this->pdo->prepare($sql);
+            $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([
-            ':nom' => $this->nom,
-            ':description' => $this->description,
-            ':id' => $this->id
-        ]);
+            return $stmt->execute([
+                ':nom' => $this->nom,
+                ':description' => $this->description,
+                ':id' => $this->id
+            ]);
+        }
     }
 
 
@@ -97,13 +94,14 @@ class Categorie extends Database
     }
 
 
-    public function getById(int $id)
+    public static function find(int $id)
     {
         $sql = "SELECT * FROM categorie WHERE id_c = :id";
-        $stmt = $this->pdo->prepare($sql);
+        $stmt = self::$pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
+
     }
 
 
