@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $client = new Client(0, "", "", "", "", 0);
 
 
-    $existing = $client->foundEmail($email);
+    $existing = $client->find($email);
     if ($existing) {
         $_SESSION['error'] = "Cet email est déjà utilisé.";
         header("Location: sign.php");
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $client->setRole("client");
 
 
-    if ($client->create()) {
+    if ($client->save()) {
         $_SESSION['success'] = "Compte créé avec succès! Vous pouvez maintenant vous connecter.";
         header("Location: login.php");
         exit;
