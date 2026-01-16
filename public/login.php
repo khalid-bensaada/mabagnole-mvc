@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $client = new Client(0, "", "", "", "", 0);
 
 
-    $user = $client->foundEmail($email);
+    $user = $client->find($email);
 
     if ($user && password_verify($password, $user['password_C'])) {
 
