@@ -10,14 +10,14 @@ class Categorie extends BaseModel
     public $vehicules = [];
 
 
-    public function __construct(int $id, string $nom = '', string $description ,  $vehicules = [])
+    public function __construct(int $id, string $nom = '', string $description,  $vehicules = [])
     {
 
         $this->id = $id;
         $this->nom = $nom;
         $this->description = $description;
         $this->vehicules = $vehicules;
-    }   
+    }
 
 
 
@@ -130,5 +130,12 @@ class Categorie extends BaseModel
         $stmt->execute(['id' => $this->id]);
 
         $this->vehicules = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    public static function findAll(PDO $pdo)
+    {
+        $stmt = $pdo->query("SELECT * FROM categories");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
